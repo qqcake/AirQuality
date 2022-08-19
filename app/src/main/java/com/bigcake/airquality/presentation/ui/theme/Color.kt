@@ -1,4 +1,4 @@
-package com.bigcake.airquality.ui.theme
+package com.bigcake.airquality.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
