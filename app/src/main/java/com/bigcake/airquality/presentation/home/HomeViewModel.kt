@@ -1,4 +1,4 @@
-package com.bigcake.airquality.presentation
+package com.bigcake.airquality.presentation.home
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -6,10 +6,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.bigcake.airquality.domain.entity.AirQuality
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 @HiltViewModel
-class AirQualityViewModel : ViewModel() {
-    var state by mutableStateOf(AirQualityState())
+class HomeViewModel @Inject constructor() : ViewModel() {
+    var state by mutableStateOf(HomeViewState())
         private set
 
     init {
