@@ -1,5 +1,6 @@
 package com.bigcake.airquality.presentation.home
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -10,7 +11,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -20,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bigcake.airquality.domain.entity.AirQuality
@@ -36,11 +38,13 @@ fun HomeScreen(
             HomeTopAppBar(onSearchAction = onNavigateToSearch)
         },
         content = { innerPadding ->
+            val state = viewModel.state
             HomeContent(
                 innerPaddingValues = innerPadding,
-                lowPm25Items = viewModel.state.lowPm25Items,
-                highPm25Items = viewModel.state.highPm25Items,
-                onGenerateButtonClick = viewModel::onGenerateButtonClicked,
+                isLoading = state.isLoading,
+                lowPm25Items = state.lowPm25Items,
+                highPm25Items = state.highPm25Items,
+                error = state.error,
             )
         }
     )
@@ -67,35 +71,45 @@ fun HomeTopAppBar(
 @Composable
 fun HomeContent(
     innerPaddingValues: PaddingValues,
+    isLoading: Boolean,
     lowPm25Items: List<AirQuality>,
     highPm25Items: List<AirQuality>,
-    onGenerateButtonClick: () -> Unit,
+    error: String,
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(innerPaddingValues)
     ) {
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = onGenerateButtonClick
-        ) {
-            Text(text = "Add New Item")
+        when {
+            isLoading -> Loading()
+            error.isNotEmpty() -> ErrorMessage(error = error)
+            else -> {
+                AirQualityCards(airQualities = lowPm25Items)
+                AirQualityList(airQualities = highPm25Items, onItemClick = {})
+            }
         }
-        AirQualityCards(airQualities = lowPm25Items)
-        AirQualityList(airQualities = highPm25Items, onItemClick = {})
     }
-//        if (viewModel.state.error.isNotBlank()) {
-//            Text(
-//                text = viewModel.state.error,
-//                color = MaterialTheme.colorScheme.error,
-//                textAlign = TextAlign.Center,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(horizontal = 20.dp)
-//                    .align(Alignment.Center)
-//            )
-//        }
+}
+
+@Composable
+fun Loading() {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+fun ErrorMessage(error: String) {
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+        Text(
+            text = error,
+            color = MaterialTheme.colorScheme.error
+        )
+    }
 }
 
 @Composable
