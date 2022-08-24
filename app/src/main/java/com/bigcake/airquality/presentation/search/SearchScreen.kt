@@ -1,39 +1,40 @@
 package com.bigcake.airquality.presentation.search
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Divider
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.bigcake.airquality.domain.entity.AirQuality
+import androidx.navigation.NavController
 import com.bigcake.airquality.presentation.components.AirQualityList
+import com.bigcake.airquality.presentation.components.SimpleDivider
 import com.bigcake.airquality.presentation.home.HomeViewModel
+import com.bigcake.airquality.presentation.model.AirQualityItemData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
+    navController: NavController,
     viewModel: SearchViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel
 ) {
@@ -44,6 +45,9 @@ fun SearchScreen(
                 placeHolderText = "Search air quality by site name",
                 onSearchTextChange = {
                     viewModel.onSearchTextChange(homeViewModel.state.allItems, it)
+                },
+                onNavigationBack = {
+                    navController.popBackStack()
                 }
             )
         },
@@ -62,44 +66,55 @@ fun SearchScreen(
 fun SearchTopBar(
     searchText: String,
     placeHolderText: String,
-    onSearchTextChange: (String) -> Unit
+    onSearchTextChange: (String) -> Unit,
+    onNavigationBack: () -> Unit = {},
 ) {
-    Column(modifier = Modifier.background(Color.Red)) {
-        SmallTopAppBar(
-            title = {},
-            actions = {
-                OutlinedTextField(
-                    value = searchText,
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Filled.Search,
-                            contentDescription = null
-                        )
-                    },
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        containerColor = Color.Transparent,
-                        focusedBorderColor = Color.Transparent,
-                        unfocusedBorderColor = Color.Transparent,
-                    ),
-                    onValueChange = onSearchTextChange,
-                    placeholder = { Text(placeHolderText) },
-                    modifier = Modifier
-                        .weight(1f)
-                        .background(
-                            MaterialTheme.colorScheme.surfaceVariant,
-                            RoundedCornerShape(50)
-                        )
-                )
-                IconButton(onClick = {}) {
-                    Icon(
-                        imageVector = Icons.Filled.Close,
-                        contentDescription = "Back to Home"
+    SmallTopAppBar(
+        title = {
+            BottomOutlineTextField(
+                value = searchText,
+                placeholder = placeHolderText,
+                onValueChange = onSearchTextChange,
+                textColor = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = onNavigationBack) {
+                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "")
+            }
+        }
+    )
+}
+
+@Composable
+fun BottomOutlineTextField(
+    placeholder: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    textColor: Color = Color.Unspecified
+) {
+    BasicTextField(
+        modifier = Modifier.fillMaxWidth(),
+        value = value,
+        onValueChange = onValueChange,
+        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+        singleLine = true,
+        maxLines = 1,
+        textStyle = MaterialTheme.typography.titleMedium.copy(color = textColor),
+        decorationBox = { innerTextField ->
+            Row(modifier = Modifier.fillMaxWidth()) {
+                if (value.isEmpty()) {
+                    Text(
+                        text = placeholder,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.alpha(.7f)
                     )
                 }
             }
-        )
-        Divider(modifier = Modifier.fillMaxWidth())
-    }
+            innerTextField()
+        }
+    )
 }
 
 @Preview
@@ -113,15 +128,16 @@ fun SearchTopBarPreview() {
 fun SearchContent(
     innerPaddingValues: PaddingValues,
     searchText: String,
-    searchedItems: List<AirQuality>
+    searchedItems: List<AirQualityItemData>
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(innerPaddingValues)
     ) {
+        SimpleDivider(modifier = Modifier.fillMaxWidth())
         if (searchedItems.isNotEmpty()) {
-            AirQualityList(airQualities = searchedItems, onItemClick = {})
+            AirQualityList(items = searchedItems)
         } else if (searchText.isNotEmpty()) {
             Notice(searchText = "Cannot find air quality for site named '$searchText'")
         } else {
@@ -132,12 +148,7 @@ fun SearchContent(
 
 @Composable
 fun Notice(searchText: String) {
-    Text(
-        text = searchText,
-        textAlign = TextAlign.Center,
-        style = MaterialTheme.typography.titleMedium,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    )
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text(text = searchText)
+    }
 }

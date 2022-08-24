@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.bigcake.airquality.domain.Result
 import com.bigcake.airquality.domain.entity.AirQuality
 import com.bigcake.airquality.domain.usecase.GetAirQualityUseCase
+import com.bigcake.airquality.presentation.mapper.toCardData
+import com.bigcake.airquality.presentation.mapper.toListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -34,25 +36,19 @@ class HomeViewModel @Inject constructor(
     private fun handleAirQualitiesResult(result: Result<List<AirQuality>>) {
         when (result) {
             is Result.Success -> {
-                val newItems = result.data
-                val lowPm25Items = mutableListOf<AirQuality>()
-                val highPm25Items = mutableListOf<AirQuality>()
-                result.data.forEach {
-                    if (it.pm25 <= state.pm25Threshold) {
-                        lowPm25Items.add(it)
-                    } else {
-                        highPm25Items.add(it)
-                    }
-                }
+                val divideResult = AirQualityDivider.divideByPm25(result.data)
                 state = state.copy(
-                    allItems = newItems,
-                    lowPm25Items = lowPm25Items,
-                    highPm25Items = highPm25Items,
+                    allItems = result.data.map { it.toListItem() },
+                    pm25Threshold = divideResult.divider,
+                    lowPm25Items = divideResult.lowPm25Items.map { it.toCardData() },
+                    highPm25Items = divideResult.highPm25Items.map { it.toListItem() },
                     error = "",
                     isLoading = false
                 )
             }
-            is Result.Failure -> state = HomeViewState(error = result.message)
+            is Result.Failure -> {
+                state = HomeViewState(error = result.message)
+            }
         }
     }
 }
