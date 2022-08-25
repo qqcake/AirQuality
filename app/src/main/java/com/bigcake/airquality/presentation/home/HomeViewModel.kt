@@ -26,8 +26,12 @@ class HomeViewModel @Inject constructor(
         fetchAirQualities()
     }
 
+    fun onRefresh() {
+        fetchAirQualities()
+    }
+
     private fun fetchAirQualities() {
-        state = HomeViewState(isLoading = true)
+        state = state.copy(isLoading = true)
         getAirQualityUseCase.invoke()
             .onEach { handleAirQualitiesResult(it) }
             .launchIn(viewModelScope)

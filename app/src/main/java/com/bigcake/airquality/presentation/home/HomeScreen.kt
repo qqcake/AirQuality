@@ -32,7 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bigcake.airquality.domain.entity.AirQuality
-import com.bigcake.airquality.presentation.components.AirQualityList
+import com.bigcake.airquality.presentation.components.RefreshableAirQualityList
 import com.bigcake.airquality.presentation.components.SimpleDivider
 import com.bigcake.airquality.presentation.mapper.toCardData
 import com.bigcake.airquality.presentation.model.AirQualityCardData
@@ -56,6 +56,7 @@ fun HomeScreen(
                 lowPm25Items = state.lowPm25Items,
                 highPm25Items = state.highPm25Items,
                 error = state.error,
+                onSwipeRefresh = { viewModel.onRefresh() },
             )
         }
     )
@@ -86,6 +87,7 @@ fun HomeContent(
     lowPm25Items: List<AirQualityCardData>,
     highPm25Items: List<AirQualityItemData>,
     error: String,
+    onSwipeRefresh: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -93,12 +95,17 @@ fun HomeContent(
             .padding(innerPaddingValues)
     ) {
         when {
-            isLoading -> Loading()
             error.isNotEmpty() -> ErrorMessage(error = error)
             else -> {
                 AirQualityCards(airQualities = lowPm25Items)
-                SimpleDivider(modifier = Modifier.alpha(.7f))
-                AirQualityList(items = highPm25Items)
+                if (lowPm25Items.isNotEmpty()) {
+                    SimpleDivider(modifier = Modifier.alpha(.7f))
+                }
+                RefreshableAirQualityList(
+                    items = highPm25Items,
+                    isLoading = isLoading,
+                    onSwipeRefresh = onSwipeRefresh
+                )
             }
         }
     }
