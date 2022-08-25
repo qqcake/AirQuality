@@ -52,6 +52,11 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+        }
+    }
 }
 
 dependencies {
@@ -79,6 +84,16 @@ dependencies {
 
     // Swipe refresh
     implementation "com.google.accompanist:accompanist-swiperefresh:0.25.1"
+
+    // JUnit5
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.0'
+
+    // Coroutine test
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"
+
+    // Mocking
+    testImplementation 'io.mockk:mockk:1.12.5'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

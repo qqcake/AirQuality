@@ -2,10 +2,14 @@ package com.bigcake.airquality.presentation.home
 
 import com.bigcake.airquality.domain.entity.AirQuality
 
+/**
+ * A helper object that divides air quality list into two groups by the average of pm2.5 for
+ * all air qualities.
+ */
 object AirQualityDivider {
     const val DEFAULT_PM25_DIVIDER = 30
     fun divideByPm25(airQualities: List<AirQuality>): DivideByPm25Result {
-        if (airQualities.isNullOrEmpty()) {
+        if (airQualities.isEmpty()) {
             return DivideByPm25Result.EMPTY
         }
         val divider = calculateAveragePm25(airQualities)
@@ -27,7 +31,8 @@ object AirQualityDivider {
 
     private fun calculateAveragePm25(airQualities: List<AirQuality>): Int {
         val validItems = airQualities.filter { it.pm25 != AirQuality.INVALID_PM25 }
-        return validItems.sumOf { it.pm25 } / validItems.size
+        return if (validItems.isEmpty()) DEFAULT_PM25_DIVIDER
+        else validItems.sumOf { it.pm25 } / validItems.size
     }
 
     data class DivideByPm25Result(
