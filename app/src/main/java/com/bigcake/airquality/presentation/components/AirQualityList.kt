@@ -26,15 +26,21 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bigcake.airquality.presentation.model.AirQualityItemData
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
-@Composable
-fun AirQualityList(
-    items: List<AirQualityItemData>,
-    onItemClick: (context: Context, onClickText: String) -> Unit = { context, onClickText ->
+object AirQualityListDefaults {
+    val onItemClick: (context: Context, onClickText: String) -> Unit = { context, onClickText ->
         if (onClickText.isNotEmpty()) {
             Toast.makeText(context, onClickText, Toast.LENGTH_SHORT).show()
         }
     }
+}
+
+@Composable
+fun AirQualityList(
+    items: List<AirQualityItemData>,
+    onItemClick: (context: Context, onClickText: String) -> Unit = AirQualityListDefaults.onItemClick
 ) {
     val context = LocalContext.current
     LazyColumn(
@@ -48,6 +54,24 @@ fun AirQualityList(
                     showIndication = item.onClickText.isNotEmpty()
                 ) { onItemClick(context, item.onClickText) }
             }
+        )
+    }
+}
+
+@Composable
+fun RefreshableAirQualityList(
+    items: List<AirQualityItemData>,
+    onItemClick: (context: Context, onClickText: String) -> Unit = AirQualityListDefaults.onItemClick,
+    isLoading: Boolean,
+    onSwipeRefresh: () -> Unit,
+) {
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isLoading),
+        onRefresh = onSwipeRefresh,
+    ) {
+        AirQualityList(
+            items = items,
+            onItemClick = onItemClick
         )
     }
 }
