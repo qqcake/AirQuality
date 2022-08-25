@@ -1,7 +1,7 @@
-package com.bigcake.airquality.data.remote
+package com.bigcake.airquality.network.api
 
 import com.bigcake.airquality.BuildConfig
-import com.bigcake.airquality.data.model.AirQualitiesDto
+import com.bigcake.airquality.network.model.AirQualitiesDto
 import retrofit2.http.GET
 import retrofit2.http.Query
 
