@@ -1,12 +1,16 @@
 package com.bigcake.airquality.data.mapper
 
-import com.bigcake.airquality.data.model.AirQualitiesDto
+import com.bigcake.airquality.data.model.AirQualityData
 import com.bigcake.airquality.domain.entity.AirQuality
 
-fun AirQualitiesDto.Record.toDomain(): AirQuality {
+fun List<AirQualityData>.toDomain(): List<AirQuality> {
+    return this.map(AirQualityData::toDomain)
+}
+
+private fun AirQualityData.toDomain(): AirQuality {
     return AirQuality(
-        siteName = sitename,
-        siteId = siteid.toInt(),
+        siteName = siteName,
+        siteId = siteId.toInt(),
         county = county,
         status = status,
         pm25 = if (pm25.isNotEmpty()) pm25.toInt() else AirQuality.INVALID_PM25,

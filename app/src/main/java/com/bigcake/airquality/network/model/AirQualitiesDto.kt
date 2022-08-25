@@ -1,4 +1,4 @@
-package com.bigcake.airquality.data.model
+package com.bigcake.airquality.network.model
 
 
 import com.squareup.moshi.Json

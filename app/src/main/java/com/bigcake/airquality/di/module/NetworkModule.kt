@@ -1,7 +1,7 @@
 package com.bigcake.airquality.di.module
 
 import com.bigcake.airquality.BuildConfig
-import com.bigcake.airquality.data.remote.AirQualityService
+import com.bigcake.airquality.network.api.AirQualityService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
