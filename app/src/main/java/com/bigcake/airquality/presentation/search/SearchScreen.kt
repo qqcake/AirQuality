@@ -18,9 +18,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.tooling.preview.Preview
@@ -93,8 +97,11 @@ fun BottomOutlineTextField(
     onValueChange: (String) -> Unit,
     textColor: Color = Color.Unspecified
 ) {
+    val focusRequester = remember { FocusRequester() }
     BasicTextField(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .focusRequester(focusRequester),
         value = value,
         onValueChange = onValueChange,
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
@@ -115,6 +122,10 @@ fun BottomOutlineTextField(
             innerTextField()
         }
     )
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 }
 
 @Preview
