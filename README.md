@@ -1,7 +1,7 @@
 # AirQuality
 A simple project fetching air quality info from EPA Taiwan.
 
-API: https://data.epa.gov.tw/swagger/en/#/air/get_aqx_p_432\
+API: https://data.epa.gov.tw/swagger/en/#/air/get_aqx_p_432 \
 Apply for API key: http://data.epa.gov.tw/en/api-term
 
 Please install you API key by adding the following line into local.property file
